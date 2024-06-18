@@ -1,3 +1,3 @@
-module skillfactory/goroutes/goroutine8
+module pipeline
 
 go 1.19
