@@ -38,8 +38,8 @@ func NewRingBuffer(size uint, timeout uint) *RingBuffer {
 func (r *RingBuffer) Set(n int) {
 	f := "function Set:"
 	r.mux.Lock()
-	log.Printf("%s begin: r.sidx=%s  r.gidx=%s", f, r.sidx, r.gidx)
-	log.Printf("%s r.buf[r.sidx]=%s замещен n=%s", f, r.buf[r.sidx], n)
+	log.Printf("%s begin: r.sidx=%v  r.gidx=%v", f, r.sidx, r.gidx)
+	log.Printf("%s r.buf[r.sidx]=%v замещен n=%v", f, r.buf[r.sidx], n)
 	r.buf[r.sidx] = n
 	if r.gidx == r.sidx && !r.buf_empty {
 		r.gidx++
@@ -83,7 +83,7 @@ func (r *RingBuffer) Get() (int, bool) {
 // заполяем кольцевой буфер из внешнего источника (канала)
 func (r *RingBuffer) WriteToBuffer(ch <-chan int) <-chan any {
 	f := "function WriteToBuffer"
-	log.Printf("%s Begin")
+	log.Printf("%s Begin", f)
 	done := make(chan any)
 	go func(ch <-chan int) {
 		defer close(done)
@@ -92,7 +92,7 @@ func (r *RingBuffer) WriteToBuffer(ch <-chan int) <-chan any {
 			//<-time.After(r.timeout)
 			r.Set(n)
 		}
-		log.Printf("%s End")
+		log.Printf("%s End", f)
 	}(ch)
 	return done
 }
@@ -104,7 +104,7 @@ func (r *RingBuffer) ReadFromBuffer(done <-chan any) <-chan int {
 	c := make(chan int)
 	go func() {
 		defer func() {
-			log.Printf("%s End")
+			log.Printf("%s End", f)
 			close(c)
 		}()
 		for {
@@ -139,7 +139,7 @@ func filterNumber(cs <-chan string) <-chan int {
 				c <- i
 			}
 		}
-		log.Printf("%s End")
+		log.Printf("%s End", f)
 	}(cs)
 	return c
 }
@@ -157,7 +157,7 @@ func filterPositiveNumber(cn <-chan int) <-chan int {
 				c <- n
 			}
 		}
-		log.Printf("%s", f)
+		log.Printf("%s End", f)
 	}(cn)
 	return c
 }
@@ -190,7 +190,7 @@ func OutputToConsole(ch <-chan int) <-chan any {
 		for n := range ch {
 			log.Printf("%s receiving data n=%v", f, n)
 		}
-		log.Printf("%s End")
+		log.Printf("%s End", f)
 	}(ch)
 	return done
 }
